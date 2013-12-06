@@ -28,12 +28,12 @@
 //    if ([GPUImageContext deviceSupportsFramebufferReads])
 //    if ([GPUImageContext deviceSupportsFramebufferReads])
 //    {
-        thresholdEdgeDetectionFilter = [[GPUImageThresholdEdgeDetectionFilter alloc] init];
+//        thresholdEdgeDetectionFilter = [[GPUImageThresholdEdgeDetectionFilter alloc] init];
 //        thresholdEdgeDetectionFilter = [[GPUImageSobelEdgeDetectionFilter alloc] init];
-        [(GPUImageThresholdEdgeDetectionFilter *)thresholdEdgeDetectionFilter setThreshold:0.4];
+//        [(GPUImageThresholdEdgeDetectionFilter *)thresholdEdgeDetectionFilter setThreshold:0.4];
 //        [(GPUImageThresholdEdgeDetectionFilter *)thresholdEdgeDetectionFilter setEdgeStrength:0.25];
-        [(GPUImageThresholdEdgeDetectionFilter *)thresholdEdgeDetectionFilter setEdgeStrength:1.0];
-//        thresholdEdgeDetectionFilter = [[GPUImageCannyEdgeDetectionFilter alloc] init];
+//        [(GPUImageThresholdEdgeDetectionFilter *)thresholdEdgeDetectionFilter setEdgeStrength:1.0];
+        thresholdEdgeDetectionFilter = [[GPUImageCannyEdgeDetectionFilter alloc] init];
 //    }
 //    else
 //    {
@@ -97,7 +97,7 @@
     //    self.terminalFilter = colorPackingFilter;
     self.terminalFilter = nonMaximumSuppressionFilter;
     
-//    self.edgeThreshold = 0.95;
+    self.edgeThreshold = 0.95;
     self.lineDetectionThreshold = 0.8;
     
     return self;
@@ -207,6 +207,7 @@
 #pragma mark -
 #pragma mark Accessors
 
+
 /*
 - (void)setEdgeThreshold:(CGFloat)newValue;
 {
@@ -217,7 +218,7 @@
 {
     return thresholdEdgeDetectionFilter.threshold;
 }
- */
+*/
 
 - (void)setLineDetectionThreshold:(CGFloat)newValue;
 {
