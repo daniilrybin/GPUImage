@@ -17,7 +17,8 @@ NSString *const kGPUImageHoughAccumulationFragmentShaderString = SHADER_STRING
  
  void main()
  {
-     gl_FragColor = vec4(0.004, 0.004, 0.004, 1.0);
+//     gl_FragColor = vec4(0.004, 0.004, 0.004, 1.0);
+     gl_FragColor = vec4(0.008, 0.008, 0.008, 1.0);
  }
 );
 

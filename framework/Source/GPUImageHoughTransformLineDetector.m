@@ -154,12 +154,12 @@
                 // T space
                 // m = -1 - d/u
                 // b = d * v/u
-                if (normalizedXCoordinate > -0.05) // Test for the case right near the X axis, stamp the X intercept instead of the Y
+                /*if (normalizedXCoordinate > -0.05) // Test for the case right near the X axis, stamp the X intercept instead of the Y
                 {
                     linesArray[cornerStorageIndex++] = 100000.0;
                     linesArray[cornerStorageIndex++] = normalizedYCoordinate;
                 }
-                else
+                else*/
                 {
                     linesArray[cornerStorageIndex++] = -1.0 - 1.0 / normalizedXCoordinate;
                     linesArray[cornerStorageIndex++] = 1.0 * normalizedYCoordinate / normalizedXCoordinate;
@@ -170,12 +170,12 @@
                 // S space
                 // m = 1 - d/u
                 // b = d * v/u
-                if (normalizedXCoordinate < 0.05) // Test for the case right near the X axis, stamp the X intercept instead of the Y
+                /*if (normalizedXCoordinate < 0.05) // Test for the case right near the X axis, stamp the X intercept instead of the Y
                 {
                     linesArray[cornerStorageIndex++] = 100000.0;
                     linesArray[cornerStorageIndex++] = normalizedYCoordinate;
                 }
-                else
+                else*/
                 {
                     linesArray[cornerStorageIndex++] = 1.0 - 1.0 / normalizedXCoordinate;
                     linesArray[cornerStorageIndex++] = 1.0 * normalizedYCoordinate / normalizedXCoordinate;
