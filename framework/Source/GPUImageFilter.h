@@ -73,7 +73,6 @@ typedef struct GPUMatrix3x3 GPUMatrix3x3;
     BOOL currentlyReceivingMonochromeInput;
     
     NSMutableDictionary *uniformStateRestorationBlocks;
-    GLubyte *rawImagePixels1;
 }
 
 @property(readonly) CVPixelBufferRef renderTarget;

@@ -165,9 +165,19 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size);
 #pragma mark -
 #pragma mark Still image processing
 
+GLubyte *rawImagePixels1;
+
+
 void dataProviderReleaseCallback (void *info, const void *data, size_t size)
 {
     NSLog(@"************ !!!! dataProviderReleaseCallback !!!");
+    
+    if (rawImagePixels1 == NULL)
+    {
+        NSLog(@"rawImagePixesl1 is null return...");
+        return;
+    }
+    
     free((void *)data);
 }
 
@@ -189,7 +199,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 
 - (CGImageRef)newCGImageFromCurrentlyProcessedOutputWithOrientation:(UIImageOrientation)imageOrientation
 {
-    NSLog(@"enter newCGImageFromCurrentlyProcessedOutputWithOrientation...");
+    NSLog(@"enter newCGImageFromCurrentlyProcessedOutputWithOrientation... %@", NSStringFromClass([self class]));
     
     // a CGImage can only be created from a 'normal' color texture
     NSAssert(self.outputTextureOptions.internalFormat == GL_RGBA, @"For conversion to a CGImage the output texture format for this filter must be GL_RGBA.");
@@ -230,8 +240,8 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
             [self setOutputFBO];
             rawImagePixels1 = (GLubyte *)malloc(totalBytesForImage);
             glReadPixels(0, 0, (int)currentFBOSize.width, (int)currentFBOSize.height, GL_RGBA, GL_UNSIGNED_BYTE, rawImagePixels1);
-//            dataProvider = CGDataProviderCreateWithData(NULL, rawImagePixels, totalBytesForImage, dataProviderReleaseCallback);
-            dataProvider = CGDataProviderCreateWithData(NULL, rawImagePixels1, totalBytesForImage, NULL);
+            dataProvider = CGDataProviderCreateWithData(NULL, rawImagePixels1, totalBytesForImage, dataProviderReleaseCallback);
+            //dataProvider = CGDataProviderCreateWithData(NULL, rawImagePixels1, totalBytesForImage, NULL);
             
         }
         
@@ -1061,7 +1071,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
     {
         NSLog(@"XAMARIN - deallocating image buffer");
         free((void *)rawImagePixels1);
-        rawImagePixels1 = nil;
+        rawImagePixels1 = NULL;
     }
 }
 
