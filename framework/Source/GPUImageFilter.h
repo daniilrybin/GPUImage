@@ -73,6 +73,7 @@ typedef struct GPUMatrix3x3 GPUMatrix3x3;
     BOOL currentlyReceivingMonochromeInput;
     
     NSMutableDictionary *uniformStateRestorationBlocks;
+    GLubyte *rawImagePixels1;
 }
 
 @property(readonly) CVPixelBufferRef renderTarget;
@@ -150,5 +151,8 @@ typedef struct GPUMatrix3x3 GPUMatrix3x3;
 
 - (void)setAndExecuteUniformStateCallbackAtIndex:(GLint)uniform forProgram:(GLProgram *)shaderProgram toBlock:(dispatch_block_t)uniformStateBlock;
 - (void)setUniformsForProgramAtIndex:(NSUInteger)programIndex;
+
+
+- (void)deallocateImageBuffer;
 
 @end

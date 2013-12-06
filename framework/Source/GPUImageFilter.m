@@ -167,6 +167,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size);
 
 void dataProviderReleaseCallback (void *info, const void *data, size_t size)
 {
+    NSLog(@"************ !!!! dataProviderReleaseCallback !!!");
     free((void *)data);
 }
 
@@ -184,8 +185,11 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
     filter.preventRendering = NO;
 }
 
+
+
 - (CGImageRef)newCGImageFromCurrentlyProcessedOutputWithOrientation:(UIImageOrientation)imageOrientation
 {
+    NSLog(@"enter newCGImageFromCurrentlyProcessedOutputWithOrientation...");
     
     // a CGImage can only be created from a 'normal' color texture
     NSAssert(self.outputTextureOptions.internalFormat == GL_RGBA, @"For conversion to a CGImage the output texture format for this filter must be GL_RGBA.");
@@ -194,6 +198,10 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
     __block CGImageRef cgImageFromBytes;
 
     runSynchronouslyOnVideoProcessingQueue(^{
+        
+        NSLog(@"block 1...");
+        cgImageFromBytes = nil;
+        
         [GPUImageContext useImageProcessingContext];
         
         CGSize currentFBOSize = [self sizeOfFBO];
@@ -202,25 +210,29 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         NSUInteger paddedWidthOfImage = CVPixelBufferGetBytesPerRow(renderTarget) / 4.0;
         NSUInteger paddedBytesForImage = paddedWidthOfImage * (int)currentFBOSize.height * 4;
         
-        GLubyte *rawImagePixels;
+//        GLubyte *rawImagePixels;
         
         CGDataProviderRef dataProvider;
         if ([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage)
         {
+            NSLog(@"block a");
             //        glFlush();
             glFinish();
             CFRetain(renderTarget); // I need to retain the pixel buffer here and release in the data source callback to prevent its bytes from being prematurely deallocated during a photo write operation
             CVPixelBufferLockBaseAddress(renderTarget, 0);
             self.preventRendering = YES; // Locks don't seem to work, so prevent any rendering to the filter which might overwrite the pixel buffer data until done processing
-            rawImagePixels = (GLubyte *)CVPixelBufferGetBaseAddress(renderTarget);
-            dataProvider = CGDataProviderCreateWithData((__bridge_retained void*)self, rawImagePixels, paddedBytesForImage, dataProviderUnlockCallback);
+            rawImagePixels1 = (GLubyte *)CVPixelBufferGetBaseAddress(renderTarget);
+            dataProvider = CGDataProviderCreateWithData((__bridge_retained void*)self, rawImagePixels1, paddedBytesForImage, dataProviderUnlockCallback);
         }
         else
         {
+            NSLog(@"block b");
             [self setOutputFBO];
-            rawImagePixels = (GLubyte *)malloc(totalBytesForImage);
-            glReadPixels(0, 0, (int)currentFBOSize.width, (int)currentFBOSize.height, GL_RGBA, GL_UNSIGNED_BYTE, rawImagePixels);
-            dataProvider = CGDataProviderCreateWithData(NULL, rawImagePixels, totalBytesForImage, dataProviderReleaseCallback);
+            rawImagePixels1 = (GLubyte *)malloc(totalBytesForImage);
+            glReadPixels(0, 0, (int)currentFBOSize.width, (int)currentFBOSize.height, GL_RGBA, GL_UNSIGNED_BYTE, rawImagePixels1);
+//            dataProvider = CGDataProviderCreateWithData(NULL, rawImagePixels, totalBytesForImage, dataProviderReleaseCallback);
+            dataProvider = CGDataProviderCreateWithData(NULL, rawImagePixels1, totalBytesForImage, NULL);
+            
         }
         
         
@@ -228,10 +240,12 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         
         if ([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage)
         {
+            NSLog(@"block c");
             cgImageFromBytes = CGImageCreate((int)currentFBOSize.width, (int)currentFBOSize.height, 8, 32, CVPixelBufferGetBytesPerRow(renderTarget), defaultRGBColorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst, dataProvider, NULL, NO, kCGRenderingIntentDefault);
         }
         else
         {
+            NSLog(@"block d");
             cgImageFromBytes = CGImageCreate((int)currentFBOSize.width, (int)currentFBOSize.height, 8, 32, 4 * (int)currentFBOSize.width, defaultRGBColorSpace, kCGBitmapByteOrderDefault | kCGImageAlphaLast, dataProvider, NULL, NO, kCGRenderingIntentDefault);
         }
         
@@ -1040,6 +1054,17 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 {
     return NO;
 }
+
+- (void)deallocateImageBuffer;
+{
+    if (rawImagePixels1)
+    {
+        NSLog(@"XAMARIN - deallocating image buffer");
+        free((void *)rawImagePixels1);
+        rawImagePixels1 = nil;
+    }
+}
+
 
 #pragma mark -
 #pragma mark Accessors
