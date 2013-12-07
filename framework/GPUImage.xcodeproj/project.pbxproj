@@ -738,6 +738,13 @@
 			name = Pipeline;
 			sourceTree = "<group>";
 		};
+		5AC362F31853A0B700933A3A /* Xamarin */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Xamarin;
+			sourceTree = "<group>";
+		};
 		BC1B715D14F4AFFF00ACA2AB /* Color processing */ = {
 			isa = PBXGroup;
 			children = (
@@ -1140,6 +1147,7 @@
 		BCF1A33914DDB1EC00852800 /* GPUImage */ = {
 			isa = PBXGroup;
 			children = (
+				5AC362F31853A0B700933A3A /* Xamarin */,
 				BC245DBF14DDBCF5009FE7EB /* GPUImage.h */,
 				BCB5E79214E3275100701302 /* GLProgram.h */,
 				BCB5E79314E3275200701302 /* GLProgram.m */,
