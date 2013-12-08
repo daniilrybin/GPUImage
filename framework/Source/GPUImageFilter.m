@@ -170,11 +170,11 @@ GLubyte *rawImagePixels1;
 
 void dataProviderReleaseCallback (void *info, const void *data, size_t size)
 {
-    NSLog(@"************ !!!! dataProviderReleaseCallback !!!");
+    NSLog(@"GPUImage: dataProviderReleaseCallback");
     
     if (rawImagePixels1 == NULL)
     {
-        NSLog(@"rawImagePixesl1 is null return...");
+        NSLog(@"rawImagePixesl1 are empty.");
         return;
     }
     
@@ -199,7 +199,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 
 - (CGImageRef)newCGImageFromCurrentlyProcessedOutputWithOrientation:(UIImageOrientation)imageOrientation
 {
-    NSLog(@"enter newCGImageFromCurrentlyProcessedOutputWithOrientation... %@", NSStringFromClass([self class]));
+    NSLog(@"GPUImage: newCGImageFromCurrentlyProcessedOutputWithOrientation... %@", NSStringFromClass([self class]));
     
     // a CGImage can only be created from a 'normal' color texture
     NSAssert(self.outputTextureOptions.internalFormat == GL_RGBA, @"For conversion to a CGImage the output texture format for this filter must be GL_RGBA.");
@@ -209,7 +209,6 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 
     runSynchronouslyOnVideoProcessingQueue(^{
         
-        NSLog(@"block 1...");
         cgImageFromBytes = nil;
         
         [GPUImageContext useImageProcessingContext];
@@ -225,7 +224,6 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         CGDataProviderRef dataProvider;
         if ([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage)
         {
-            NSLog(@"block a");
             //        glFlush();
             glFinish();
             CFRetain(renderTarget); // I need to retain the pixel buffer here and release in the data source callback to prevent its bytes from being prematurely deallocated during a photo write operation
@@ -236,7 +234,6 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         }
         else
         {
-            NSLog(@"block b");
             [self setOutputFBO];
             rawImagePixels1 = (GLubyte *)malloc(totalBytesForImage);
             glReadPixels(0, 0, (int)currentFBOSize.width, (int)currentFBOSize.height, GL_RGBA, GL_UNSIGNED_BYTE, rawImagePixels1);
@@ -250,12 +247,10 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         
         if ([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage)
         {
-            NSLog(@"block c");
             cgImageFromBytes = CGImageCreate((int)currentFBOSize.width, (int)currentFBOSize.height, 8, 32, CVPixelBufferGetBytesPerRow(renderTarget), defaultRGBColorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst, dataProvider, NULL, NO, kCGRenderingIntentDefault);
         }
         else
         {
-            NSLog(@"block d");
             cgImageFromBytes = CGImageCreate((int)currentFBOSize.width, (int)currentFBOSize.height, 8, 32, 4 * (int)currentFBOSize.width, defaultRGBColorSpace, kCGBitmapByteOrderDefault | kCGImageAlphaLast, dataProvider, NULL, NO, kCGRenderingIntentDefault);
         }
         
@@ -1069,7 +1064,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 {
     if (rawImagePixels1)
     {
-        NSLog(@"XAMARIN - deallocating image buffer");
+        NSLog(@"GPUImage: deallocateImageBuffer [Extension]");
         free((void *)rawImagePixels1);
         rawImagePixels1 = NULL;
     }
