@@ -195,7 +195,45 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
     filter.preventRendering = NO;
 }
 
-
+- (GLubyte *)pixelsFromCurrentlyProcessedOutput
+{
+    // a CGImage can only be created from a 'normal' color texture
+    
+    NSLog(@"! pixelsFromCurrentlyProcessedOutput started !"); //debug
+    
+    
+    NSAssert(self.outputTextureOptions.internalFormat == GL_RGBA, @"For conversion to a CGImage the output texture format for this filter must be GL_RGBA.");
+    NSAssert(self.outputTextureOptions.type == GL_UNSIGNED_BYTE, @"For conversion to a CGImage the type of the output texture of this filter must be GL_UNSIGNED_BYTE.");
+    
+    runSynchronouslyOnVideoProcessingQueue(^{
+        
+        [GPUImageContext useImageProcessingContext];
+        
+        CGSize currentFBOSize = [self sizeOfFBO];
+        NSUInteger totalBytesForImage = (int)currentFBOSize.width * (int)currentFBOSize.height * 4;
+        
+        
+        if ([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage)
+        {
+            NSLog(@"pixelsFromCurrentlyProcessedOutput in IF case"); //debug
+            glFinish();
+            CFRetain(renderTarget);
+            CVPixelBufferLockBaseAddress(renderTarget, 0);
+            self.preventRendering = YES;
+            rawImagePixels1 = (GLubyte *)CVPixelBufferGetBaseAddress(renderTarget);
+        }
+        else
+        {
+            NSLog(@"pixelsFromCurrentlyProcessedOutput in ELSE case"); //debug
+            [self setOutputFBO];
+            rawImagePixels1 = (GLubyte *)malloc(totalBytesForImage);
+            NSLog(@"totalBytesForImage: %d", totalBytesForImage); //debug
+            glReadPixels(0, 0, (int)currentFBOSize.width, (int)currentFBOSize.height, GL_RGBA, GL_UNSIGNED_BYTE, rawImagePixels1);
+        }
+    });
+    
+    return rawImagePixels1;
+}
 
 - (CGImageRef)newCGImageFromCurrentlyProcessedOutputWithOrientation:(UIImageOrientation)imageOrientation
 {
